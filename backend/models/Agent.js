@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const agentSchema = new mongoose.Schema({
-  userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
     unique: true // Assuming one agent profile per user
   },
@@ -19,9 +19,9 @@ const agentSchema = new mongoose.Schema({
   },
   agencyName: { type: String, trim: true },
   licenseNumber: { type: String, trim: true, unique: true, sparse: true }, // Unique if provided
-  listings: [{ 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Property' 
+  listings: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Property'
   }], // Properties managed by the agent
   // Timestamps are automatically managed by Mongoose with the { timestamps: true } option
 }, { timestamps: true }); // Adds createdAt and updatedAt automatically

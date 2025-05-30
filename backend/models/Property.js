@@ -8,21 +8,21 @@ const propertySchema = new mongoose.Schema({
   beds: { type: Number, required: true },
   baths: { type: Number, required: true },
   sqft: { type: Number, required: true },
-  propertyType: { 
-    type: String, 
-    enum: ['House', 'Apartment', 'Condo', 'Townhouse', 'Land'], 
-    required: true 
+  propertyType: {
+    type: String,
+    enum: ['House', 'Apartment', 'Condo', 'Townhouse', 'Land'],
+    required: true
   },
   description: { type: String, trim: true },
   images: [{ type: String }], // Array of image URLs
-  agent: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Agent' 
+  agent: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Agent'
   },
-  status: { 
-    type: String, 
-    enum: ['For Sale', 'For Rent', 'Sold', 'Pending'], 
-    default: 'For Sale' 
+  status: {
+    type: String,
+    enum: ['For Sale', 'For Rent', 'Sold', 'Pending'],
+    default: 'For Sale'
   },
   features: [{ type: String }], // e.g., ["Garage", "Heating", "Cooling", "Pool"]
   yearBuilt: { type: Number },

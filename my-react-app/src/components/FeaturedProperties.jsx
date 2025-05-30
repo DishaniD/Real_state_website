@@ -1,65 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropertyCard from './PropertyCard';
-
-const mockProperties = [
-  {
-    id: 1,
-    imageUrl: 'https://images.unsplash.com/photo-1512917774080-b3dc39778542?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    address: '123 Sunshine Avenue, Miami, FL',
-    beds: 4,
-    baths: 3,
-    size: 2200,
-    price: 750000,
-  },
-  {
-    id: 2,
-    imageUrl: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    address: '456 Mountain View, Denver, CO',
-    beds: 3,
-    baths: 2.5,
-    size: 1800,
-    price: 550000,
-  },
-  {
-    id: 3,
-    imageUrl: 'https://images.unsplash.com/photo-1560184897-ae75f418493e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    address: '789 Lakefront Drive, Chicago, IL',
-    beds: 5,
-    baths: 4,
-    size: 3100,
-    price: 980000,
-  },
-  {
-    id: 4,
-    imageUrl: 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    address: '101 Urban Loft, New York, NY',
-    beds: 2,
-    baths: 2,
-    size: 1200,
-    price: 1200000,
-  }
-];
+import axios from 'axios'; // Import axios
 
 const FeaturedProperties = () => {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchFeaturedProperties = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch a limited number of properties, e.g., 4 newest "For Sale"
+        // The backend API needs to support sorting by createdAt. Assuming 'createdAt_desc' for newest.
+        // For now, let's assume the backend sorts by newest by default if no sort param is given.
+        // Or, if the backend has a specific "featured" flag or sorting parameter, use that.
+        // For this example, we'll fetch with a limit and assume default sort is okay for "featured".
+        const response = await axios.get('http://localhost:5000/api/properties?limit=4&status=For Sale&sort=createdAt_desc');
+
+        if (response.data && response.data.properties) {
+          setProperties(response.data.properties);
+        } else {
+          setProperties([]); // Handle cases where 'properties' might be missing
+        }
+      } catch (err) {
+        console.error("Failed to fetch featured properties:", err);
+        setError(err.response?.data?.message || 'Could not load featured properties at this time.');
+        setProperties([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProperties();
+  }, []);
+
   return (
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-10">
           Featured Properties
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {mockProperties.map(property => (
-            <PropertyCard
-              key={property.id}
-              imageUrl={property.imageUrl}
-              address={property.address}
-              beds={property.beds}
-              baths={property.baths}
-              size={property.size}
-              price={property.price}
-            />
-          ))}
-        </div>
+        {loading && <p className="text-center text-lg">Loading featured properties...</p>}
+        {error && <p className="text-center text-red-500 bg-red-100 p-3 rounded-md">{error}</p>}
+
+        {!loading && !error && properties.length === 0 && (
+          <p className="text-center text-gray-600 text-xl py-5">No featured properties available at the moment.</p>
+        )}
+
+        {!loading && !error && properties.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {properties.map(property => (
+              <PropertyCard
+                key={property._id}
+                id={property._id}
+                imageUrl={property.images && property.images.length > 0 ? property.images[0] : undefined}
+                address={property.address}
+                beds={property.beds}
+                baths={property.baths}
+                sqft={property.sqft}
+                price={property.price}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
